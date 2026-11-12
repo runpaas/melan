@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TUKOREA TECH NEXUS // 미래 연구 성과 포털</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            cyber: {
+              black: '#05070D',
+              darker: '#0B0F19',
+              card: '#0E1424',
+              neonCyan: '#00F0FF',
+              neonPink: '#FF007F',
+              neonAmber: '#FFB800',
+              neonPurple: '#9D00FF',
+              neonGreen: '#00FF66',
+              border: '#1E293B',
+              grid: '#131B2E'
+            }
+          },
+          fontFamily: {
+            mono: ['JetBrains Mono', 'Fira Code', 'Courier New', 'monospace'],
+            sans: ['Pretendard', '-apple-system', 'sans-serif']
+          },
+          animation: {
+            'pulse-fast': 'pulse 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'scanline': 'scan 8s linear infinite',
+            'glow': 'glow 2s ease-in-out infinite alternate',
+            'radar': 'radar 4s linear infinite'
+          },
+          keyframes: {
+            scan: {
+              '0%': { transform: 'translateY(-100%)' },
+              '100%': { transform: 'translateY(1000%)' }
+            },
+            glow: {
+              '0%': { filter: 'drop-shadow(0 0 5px rgba(0, 240, 255, 0.6))' },
+              '100%': { filter: 'drop-shadow(0 0 20px rgba(0, 240, 255, 0.95)) drop-shadow(0 0 35px rgba(255, 0, 127, 0.5))' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;800&display=swap');
+
+    body {
+      background-color: #05070D;
+      color: #E2E8F0;
+      font-family: 'Pretendard', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Cyber Grid Matrix Background */
+    .cyber-grid {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+    }
+
+    /* CRT Scanline effect */
+    .scanlines {
+      position: relative;
+    }
+    .scanlines::before {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.04));
+      z-index: 20;
+      background-size: 100% 3px, 6px 100%;
+      pointer-events: none;
+    }
+
+    /* Cyber Card Hover Glitch / Glow */
+    .cyber-card {
+      background: rgba(14, 20, 36, 0.85);
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(12px);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .cyber-card::after {
+      content: "";
+      position: absolute;
+      top: 0; left: -150%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.15), transparent);
+      transform: skewX(-25deg);
+      transition: 0.75s;
+    }
+    .cyber-card:hover::after {
+      left: 150%;
+    }
+    .cyber-card:hover {
+      border-color: #00F0FF;
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.3), inset 0 0 15px rgba(0, 240, 255, 0.1);
+      transform: translateY(-4px);
+    }
+
+    /* Neon Text */
+    .neon-cyan {
+      color: #00F0FF;
+      text-shadow: 0 0 10px rgba(0, 240, 255, 0.7);
+    }
+    .neon-pink {
+      color: #FF007F;
+      text-shadow: 0 0 10px rgba(255, 0, 127, 0.7);
+    }
+    .neon-amber {
+      color: #FFB800;
+      text-shadow: 0 0 10px rgba(255, 184, 0, 0.7);
+    }
+
+    /* Cyber HUD Corner Borders */
+    .hud-box {
+      position: relative;
+    }
+    .hud-box::before {
+      content: "";
+      position: absolute;
+      top: -1px; left: -1px;
+      width: 10px; height: 10px;
+      border-top: 2px solid #00F0FF;
+      border-left: 2px solid #00F0FF;
+      z-index: 10;
+    }
+    .hud-box::after {
+      content: "";
+      position: absolute;
+      bottom: -1px; right: -1px;
+      width: 10px; height: 10px;
+      border-bottom: 2px solid #00F0FF;
+      border-right: 2px solid #00F0FF;
+      z-index: 10;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #05070D;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1E293B;
+      border-radius: 2px;
+      border: 1px solid #00F0FF44;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00F0FF;
+    }
+  </style>
+</head>
+<body class="cyber-grid scanlines min-h-screen flex flex-col selection:bg-cyber-neonPink selection:text-white">
+
+  <!-- TOP TICKER TAPE -->
+  <div class="border-b border-cyber-neonCyan/30 bg-cyber-black/90 backdrop-blur-md text-[11px] font-mono tracking-widest py-1.5 px-4 text-cyber-neonCyan flex items-center justify-between overflow-hidden z-50">
+    <div class="flex items-center gap-3 overflow-hidden whitespace-nowrap">
+      <span class="inline-flex items-center gap-1.5 px-1.5 py-0.5 bg-cyber-neonPink/20 text-cyber-neonPink border border-cyber-neonPink/50 font-bold uppercase text-[10px]">
+        <span class="w-1.5 h-1.5 bg-cyber-neonPink rounded-full animate-ping"></span> LIVE SYS: CONNECTED
+      </span>
+      <span class="text-slate-400">TUKOREA R&D NEXUS // TECH TRL STATUS VERIFIED // 10,000+ ENTERPRISE MATRIX ACTIVE</span>
+    </div>
+    <div class="hidden md:flex items-center gap-4 text-slate-400 shrink-0">
+      <span>LAT: 37.3402° N | LON: 126.7335° E</span>
+      <span id="systemClock" class="text-cyber-neonCyan font-bold">2026-11-12 14:15:00 KST</span>
+    </div>
+  </div>
+
+  <!-- MAIN NAVIGATION / HUD HEADER -->
+  <header class="sticky top-0 z-40 bg-cyber-darker/90 backdrop-blur-xl border-b border-cyber-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <!-- Logo -->
+        <div class="flex items-center gap-3 cursor-pointer" onclick="navigateTab('explore')">
+          <div class="relative w-12 h-12 bg-cyber-black rounded-lg border-2 border-cyber-neonCyan flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(0,240,255,0.4)]">
+            <span class="font-mono font-black text-xl text-cyber-neonCyan tracking-tighter">TU</span>
+            <div class="absolute inset-0 bg-gradient-to-t from-cyber-neonCyan/20 to-transparent pointer-events-none"></div>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-black text-xl tracking-wider text-white">TUKOREA</span>
+              <span class="font-mono text-xs px-2 py-0.5 rounded border border-cyber-neonPink text-cyber-neonPink bg-cyber-neonPink/10 font-bold">
+                R&D MATRIX 2.0
+              </span>
+            </div>
+            <p class="text-xs font-mono text-slate-400">한국공학대학교 미래기술사업화 포털</p>
+          </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="hidden lg:flex items-center space-x-1 font-mono text-xs tracking-wider">
+          <button onclick="navigateTab('explore')" class="nav-btn px-4 py-2.5 rounded border transition-all flex items-center gap-2 text-cyber-neonCyan border-cyber-neonCyan bg-cyber-neonCyan/10 shadow-[0_0_12px_rgba(0,240,255,0.25)]" data-tab="explore">
+            <i data-lucide="crosshair" class="w-4 h-4"></i> [01] 성과 아카이브
+          </button>
+          <button onclick="navigateTab('transfer')" class="nav-btn px-4 py-2.5 rounded border border-transparent hover:border-slate-700 text-slate-300 hover:text-cyber-neonPink transition-all flex items-center gap-2" data-tab="transfer">
+            <i data-lucide="zap" class="w-4 h-4"></i> [02] 기술이전 & 사업화
+          </button>
+          <button onclick="navigateTab('centers')" class="nav-btn px-4 py-2.5 rounded border border-transparent hover:border-slate-700 text-slate-300 hover:text-cyber-neonAmber transition-all flex items-center gap-2" data-tab="centers">
+            <i data-lucide="cpu" class="w-4 h-4"></i> [03] 5T ICC & 오픈랩
+          </button>
+          <button onclick="navigateTab('stats')" class="nav-btn px-4 py-2.5 rounded border border-transparent hover:border-slate-700 text-slate-300 hover:text-cyber-neonGreen transition-all flex items-center gap-2" data-tab="stats">
+            <i data-lucide="terminal" class="w-4 h-4"></i> [04] R&D 텔레메트리
+          </button>
+        </nav>
+
+        <!-- Right Action Button -->
+        <div class="flex items-center gap-3 font-mono">
+          <button onclick="openInquiryModal()" class="relative group px-4 py-2 text-xs font-bold uppercase tracking-wider text-black bg-cyber-neonCyan hover:bg-white transition-all shadow-[0_0_20px_rgba(0,240,255,0.6)] rounded-sm flex items-center gap-2">
+            <span class="w-2 h-2 bg-black rounded-full animate-ping"></span>
+            <span>기술도입 / 협력접수</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN WRAPPER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+    <!-- CYBER HERO SECTION -->
+    <section class="relative rounded-2xl overflow-hidden border border-cyber-neonCyan/40 bg-gradient-to-br from-cyber-black via-cyber-card to-cyber-darker p-8 sm:p-12 shadow-[0_0_40px_rgba(0,240,255,0.15)] hud-box">
+      <!-- Cyber Graphic Elements -->
+      <div class="absolute right-0 top-0 w-full h-full opacity-15 pointer-events-none bg-[radial-gradient(#00F0FF_1px,transparent_1px)] [background-size:16px_16px]"></div>
+      <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-cyber-neonCyan/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute right-12 bottom-6 opacity-20 pointer-events-none hidden md:block">
+        <i data-lucide="orbit" class="w-72 h-72 text-cyber-neonCyan animate-spin" style="animation-duration: 40s;"></i>
+      </div>
+
+      <div class="relative z-10 max-w-3xl space-y-5">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-cyber-neonCyan/10 border border-cyber-neonCyan/40 font-mono text-xs text-cyber-neonCyan">
+          <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-cyber-neonPink"></i>
+          BREAKTHROUGH TECH MATRIX: KOREA's ADVANCED ENGINEERING HUB
+        </div>
+
+        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-none text-white">
+          원천 기술의 한계를 넘어 <br>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyber-neonCyan via-sky-300 to-cyber-neonPink font-mono">
+            CYBER-INDUSTRY REVOLUTION
+          </span>
+        </h1>
+
+        <p class="text-slate-300 text-sm sm:text-base font-light leading-relaxed max-w-2xl">
+          한국공학대학교는 반도체·우주소재·초정밀 광학 AI·스마트 제조 자동화의 극한 난제를 해결합니다. 
+          반월·시화 국가산단 1만여 기업 밸류체인과 직결되는 대한민국 대표 실증형 R&D의 정점을 경험하십시오.
+        </p>
+
+        <!-- Cyber Metrics HUD Bar -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 font-mono">
+          <div class="p-3 bg-cyber-darker/90 border border-cyber-neonCyan/30 rounded">
+            <div class="text-[10px] text-cyber-neonCyan uppercase tracking-widest">GLOBAL FIRST</div>
+            <div class="text-xl sm:text-2xl font-black text-white mt-1">APWS 기조</div>
+            <div class="text-[11px] text-slate-400 mt-0.5">우주 다이아몬드 반도체</div>
+          </div>
+          <div class="p-3 bg-cyber-darker/90 border border-cyber-neonPink/30 rounded">
+            <div class="text-[10px] text-cyber-neonPink uppercase tracking-widest">TRANSFER VALUE</div>
+            <div class="text-xl sm:text-2xl font-black text-white mt-1">100억+</div>
+            <div class="text-[11px] text-slate-400 mt-0.5">성과연동형 대형 기술이전</div>
+          </div>
+          <div class="p-3 bg-cyber-darker/90 border border-cyber-neonAmber/30 rounded">
+            <div class="text-[10px] text-cyber-neonAmber uppercase tracking-widest">SPECIALIZED ICC</div>
+            <div class="text-xl sm:text-2xl font-black text-white mt-1">5T 클러스터</div>
+            <div class="text-[11px] text-slate-400 mt-0.5">반도체·모빌리티·DX 거점</div>
+          </div>
+          <div class="p-3 bg-cyber-darker/90 border border-cyber-neonGreen/30 rounded">
+            <div class="text-[10px] text-cyber-neonGreen uppercase tracking-widest">OPEN LAB MATRIX</div>
+            <div class="text-xl sm:text-2xl font-black text-white mt-1">500+ 기업</div>
+            <div class="text-[11px] text-slate-400 mt-0.5">제조 AX 시뮬레이션 실증</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 1: 성과 아카이브 (Visual Focused Cards) -->
+    <section id="exploreSection" class="space-y-6">
+      
+      <!-- Section Header & Filter HUD -->
+      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-4 border-b border-cyber-border">
+        <div>
+          <div class="flex items-center gap-2 font-mono text-xs text-cyber-neonCyan uppercase tracking-widest mb-1">
+            <i data-lucide="terminal" class="w-4 h-4"></i> ARCHIVE PROTOCOL // LEVEL 1 PUBLIC ACCESS
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-black text-white tracking-wide flex items-center gap-3">
+            주요 첨단 연구 프로젝트
+            <span class="text-xs font-mono font-normal px-2.5 py-0.5 rounded border border-cyber-neonCyan/50 bg-cyber-neonCyan/10 text-cyber-neonCyan">
+              TOTAL <span id="cardCount">6</span> PROJECTS
+            </span>
+          </h2>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="flex flex-wrap items-center gap-2 font-mono text-xs">
+          <div class="relative min-w-[240px]">
+            <input type="text" id="searchInput" placeholder="SEARCH TECH / RESEARCHER..." class="w-full pl-9 pr-4 py-2 bg-cyber-darker border border-cyber-border rounded focus:outline-none focus:border-cyber-neonCyan text-white placeholder-slate-500">
+            <i data-lucide="search" class="w-4 h-4 text-slate-500 absolute left-3 top-2.5"></i>
+          </div>
+          <select id="fieldFilter" class="px-3 py-2 bg-cyber-darker border border-cyber-border rounded focus:outline-none focus:border-cyber-neonCyan text-slate-300">
+            <option value="ALL">// 전체 테크 매트릭스</option>
+            <option value="반도체/우주소재">차세대 우주반도체 & 신소재</option>
+            <option value="AI/레이저광학">딥러닝 AI & 초정밀 광학엔진</option>
+            <option value="사이버보안/시스템">미션크리티컬 OS & 시스템 복구</option>
+            <option value="스마트로보틱스/HMI">멀티모달 자동화 & 로봇공학</option>
+            <option value="디지털트윈/제조AX">산업용 디지털트윈 & 예지보전</option>
+            <option value="첨단패키징/HBM">AI 반도체 초미세 인터포저</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- VISUAL RESEARCH CARDS GRID -->
+      <div id="researchGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Injected via JavaScript -->
+      </div>
+    </section>
+
+    <!-- SECTION 2: 기술이전 & 사업화 (Transfer Section) -->
+    <section id="transferSection" class="space-y-6 hidden">
+      <div class="pb-4 border-b border-cyber-border">
+        <div class="flex items-center gap-2 font-mono text-xs text-cyber-neonPink uppercase tracking-widest mb-1">
+          <i data-lucide="activity" class="w-4 h-4"></i> TECH LICENSING & SPIN-OFF DIRECTORY
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-black text-white tracking-wide">
+          중대형 기술이전 & 상용화 성공 사례
+        </h2>
+        <p class="text-sm text-slate-400 mt-1 max-w-3xl">
+          과기정통부 TLO혁신형 사업과 연계하여, 단순 특허 등록에 그치지 않고 산업 현장에서 폭발적 부가가치를 창출하는 성과연동형 기술사업화 모델입니다.
+        </p>
+      </div>
+
+      <!-- Visual Spotlight Cards -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" id="transferHighlightGrid">
+        <!-- Rendered in JS -->
+      </div>
+
+      <!-- Case Directory Table -->
+      <div class="cyber-card rounded-xl p-6 border border-cyber-border">
+        <div class="flex items-center justify-between mb-4 border-b border-cyber-border/80 pb-3">
+          <h3 class="font-mono text-sm font-bold text-cyber-neonCyan flex items-center gap-2 uppercase">
+            <i data-lucide="list-filter" class="w-4 h-4"></i> 산학협력단 공식 기술이전 파이프라인
+          </h3>
+          <span class="font-mono text-xs text-slate-500">LIVE SYNC WITH INDUSTRY</span>
+        </div>
+        <div class="divide-y divide-cyber-border/50 font-mono text-xs" id="transferCaseList">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: 5T ICC & 오픈랩 (Centers Section) -->
+    <section id="centersSection" class="space-y-6 hidden">
+      <div class="pb-4 border-b border-cyber-border">
+        <div class="flex items-center gap-2 font-mono text-xs text-cyber-neonAmber uppercase tracking-widest mb-1">
+          <i data-lucide="cpu" class="w-4 h-4"></i> 5T INDUSTRY COLLABORATION CENTERS
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-black text-white tracking-wide">
+          RISE 5T ICC & 제조 AX 오픈랩
+        </h2>
+        <p class="text-sm text-slate-400 mt-1 max-w-3xl">
+          2025 RISE 체계 가동으로 경기도와 시흥시, 반월·시화 국가산단을 잇는 5대 첨단 혁신 클러스터입니다.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="iccCardsGrid">
+        <!-- Rendered in JS -->
+      </div>
+    </section>
+
+    <!-- SECTION 4: R&D 텔레메트리 (Stats Section) -->
+    <section id="statsSection" class="space-y-6 hidden">
+      <div class="pb-4 border-b border-cyber-border">
+        <div class="flex items-center gap-2 font-mono text-xs text-cyber-neonGreen uppercase tracking-widest mb-1">
+          <i data-lucide="terminal" class="w-4 h-4"></i> REAL-TIME TELEMETRY & QUANTITATIVE DATA
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-black text-white tracking-wide">
+          R&D 성과 지표 & 정량적 임팩트
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Chart 1: 기술료 및 이전 실적 -->
+        <div class="cyber-card rounded-xl p-6 border border-cyber-border">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-mono text-sm font-bold text-cyber-neonCyan flex items-center gap-2">
+              <i data-lucide="bar-chart-2" class="w-4 h-4"></i> 연도별 기술이전 계약액 & 건수 추이
+            </h3>
+            <span class="font-mono text-xs text-slate-500">2021-2025</span>
+          </div>
+          <div class="h-64">
+            <canvas id="transferTrendChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2: 5T 비중 도넛 -->
+        <div class="cyber-card rounded-xl p-6 border border-cyber-border">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-mono text-sm font-bold text-cyber-neonPink flex items-center gap-2">
+              <i data-lucide="pie-chart" class="w-4 h-4"></i> 5T 첨단 R&D 과제 수주 비중
+            </h3>
+            <span class="font-mono text-xs text-slate-500">ICC CLUSTERS</span>
+          </div>
+          <div class="h-64 flex items-center justify-center">
+            <canvas id="domainDistributionChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: CYBER DETAIL MODAL -->
+  <div id="detailModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-cyber-card w-full max-w-3xl rounded-2xl border-2 border-cyber-neonCyan shadow-[0_0_50px_rgba(0,240,255,0.3)] overflow-hidden max-h-[92vh] flex flex-col hud-box animate-in fade-in duration-200">
+      
+      <!-- Modal Hero Image with Glitch Banner -->
+      <div class="relative h-60 sm:h-72 overflow-hidden bg-cyber-black">
+        <img id="modalImage" src="" alt="Tech Visual" class="w-full h-full object-cover filter brightness-90 contrast-125">
+        <div class="absolute inset-0 bg-gradient-to-t from-cyber-card via-transparent to-transparent"></div>
+        <button onclick="closeDetailModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/70 border border-cyber-neonCyan/50 text-cyber-neonCyan hover:bg-cyber-neonCyan hover:text-black transition flex items-center justify-center">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+        <div class="absolute bottom-4 left-6 right-6">
+          <div class="flex items-center gap-2 mb-1.5 font-mono text-xs">
+            <span id="modalCode" class="text-cyber-neonCyan font-bold tracking-widest">[PROJECT_CODE]</span>
+            <span class="text-slate-400">•</span>
+            <span id="modalCategory" class="px-2 py-0.5 bg-cyber-neonPink/20 text-cyber-neonPink border border-cyber-neonPink/40 rounded text-[11px] font-bold">CATEGORY</span>
+          </div>
+          <h3 id="modalTitle" class="text-xl sm:text-2xl font-black text-white tracking-tight drop-shadow-md">연구 프로젝트 타이틀</h3>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 overflow-y-auto space-y-6 text-slate-300 font-sans custom-scrollbar text-sm flex-1">
+        
+        <!-- Professor & Lab HUD -->
+        <div class="p-4 bg-cyber-darker border border-cyber-border rounded-xl flex items-center justify-between font-mono">
+          <div>
+            <div class="text-xs text-slate-400">RESEARCH LEAD / LAB</div>
+            <div id="modalLead" class="text-base font-bold text-white mt-0.5">남옥현 교수 연구팀</div>
+            <div id="modalDept" class="text-xs text-cyber-neonCyan">한국공학대학교 신소재공학과</div>
+          </div>
+          <div class="text-right">
+            <div class="text-xs text-slate-400">TECH READINESS LEVEL</div>
+            <div id="modalTRL" class="text-sm font-bold text-cyber-neonGreen mt-0.5">TRL 6 : 상용 시제품</div>
+          </div>
+        </div>
+
+        <!-- Overview -->
+        <div class="space-y-2">
+          <h4 class="font-mono text-xs font-bold text-cyber-neonCyan tracking-widest flex items-center gap-1.5 uppercase">
+            <i data-lucide="info" class="w-4 h-4"></i> [OVERVIEW] 연구 배경 및 핵심 브레이크스루
+          </h4>
+          <p id="modalSummary" class="text-slate-300 leading-relaxed font-light text-sm sm:text-base">
+            요약 설명
+          </p>
+        </div>
+
+        <!-- Technical Deep-Dive -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="p-4 bg-cyber-darker border border-cyber-border rounded-lg space-y-1">
+            <div class="font-mono text-xs text-cyber-neonPink font-bold uppercase flex items-center gap-1.5">
+              <i data-lucide="cpu" class="w-3.5 h-3.5"></i> 원천 기술 & 특허 메커니즘
+            </div>
+            <p id="modalKeyTech" class="text-xs text-slate-300 leading-relaxed">핵심 기술</p>
+          </div>
+          <div class="p-4 bg-cyber-darker border border-cyber-border rounded-lg space-y-1">
+            <div class="font-mono text-xs text-cyber-neonAmber font-bold uppercase flex items-center gap-1.5">
+              <i data-lucide="crosshair" class="w-3.5 h-3.5"></i> 적용 타겟 산업 및 확장 분야
+            </div>
+            <p id="modalApplication" class="text-xs text-slate-300 leading-relaxed">응용 산업</p>
+          </div>
+        </div>
+
+        <!-- Funding & Recognition -->
+        <div class="p-4 bg-cyber-darker/60 border-l-4 border-cyber-neonCyan rounded-r-lg space-y-1">
+          <div class="font-mono text-xs text-slate-400 uppercase">국가 R&D 지원 사업 및 대외 검증</div>
+          <div id="modalAward" class="text-xs text-white font-semibold">산자부 알키미스트 프로젝트 주관, APWS 기조강연</div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 bg-cyber-darker border-t border-cyber-border flex items-center justify-between font-mono">
+        <span class="text-xs text-slate-500">STATUS: READY FOR TECH LICENSING</span>
+        <div class="flex items-center gap-2">
+          <button onclick="closeDetailModal()" class="px-4 py-2 rounded text-xs text-slate-400 hover:text-white transition">닫기</button>
+          <button id="modalActionBtn" class="px-5 py-2 rounded text-xs font-bold text-black bg-cyber-neonCyan hover:bg-white transition flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,240,255,0.4)]">
+            <i data-lucide="zap" class="w-3.5 h-3.5"></i> 기술이전·공동개발 상담
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: INQUIRY MODAL -->
+  <div id="inquiryModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-cyber-card w-full max-w-lg rounded-2xl border border-cyber-neonPink shadow-[0_0_40px_rgba(255,0,127,0.3)] overflow-hidden font-mono text-xs">
+      <div class="p-5 border-b border-cyber-border bg-cyber-darker flex justify-between items-center">
+        <div class="flex items-center gap-2 text-cyber-neonPink font-bold tracking-wider">
+          <i data-lucide="send" class="w-4 h-4"></i> R&D PARTNERSHIP & TECH TRANSFER REQUEST
+        </div>
+        <button onclick="closeInquiryModal()" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <form id="inquiryForm" onsubmit="handleInquirySubmit(event)" class="p-6 space-y-4">
+        <div>
+          <label class="block text-slate-400 mb-1">TARGET TECH / INQUIRY TOPIC</label>
+          <input type="text" id="inquirySubject" required class="w-full px-3 py-2 bg-cyber-darker border border-cyber-border rounded text-white focus:outline-none focus:border-cyber-neonPink">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-400 mb-1">COMPANY / INSTITUTION</label>
+            <input type="text" required placeholder="(주)테크솔루션" class="w-full px-3 py-2 bg-cyber-darker border border-cyber-border rounded text-white focus:outline-none focus:border-cyber-neonPink">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">CONTACT PERSON</label>
+            <input type="text" required placeholder="홍길동 연구소장" class="w-full px-3 py-2 bg-cyber-darker border border-cyber-border rounded text-white focus:outline-none focus:border-cyber-neonPink">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-400 mb-1">PHONE NUMBER</label>
+            <input type="tel" required placeholder="010-0000-0000" class="w-full px-3 py-2 bg-cyber-darker border border-cyber-border rounded text-white focus:outline-none focus:border-cyber-neonPink">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">EMAIL ADDRESS</label>
+            <input type="email" required placeholder="contact@domain.com" class="w-full px-3 py-2 bg-cyber-darker border border-cyber-border rounded text-white focus:outline-none focus:border-cyber-neonPink">
+          </div>
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">COLLABORATION PROPOSAL</label>
+          <textarea rows="3" required placeholder="기술이전 조건 문의, 기업 맞춤형 공동 R&D 기획, AX 오픈랩 테스트베드 사용 신청 등" class="w-full px-3 py-2 bg-cyber-darker border border-cyber-border rounded text-white focus:outline-none focus:border-cyber-neonPink"></textarea>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeInquiryModal()" class="px-4 py-2 text-slate-400 hover:text-white">CANCEL</button>
+          <button type="submit" class="px-5 py-2 font-bold text-white bg-cyber-neonPink hover:bg-pink-600 rounded transition shadow-[0_0_15px_rgba(255,0,127,0.5)]">
+            SUBMIT PROTOCOL
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CYBER FOOTER -->
+  <footer class="border-t border-cyber-border bg-cyber-black py-8 font-mono text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded border border-cyber-neonCyan flex items-center justify-center text-cyber-neonCyan font-bold">TU</div>
+        <div>
+          <div class="text-slate-300 font-bold">TECH KOREA UNIVERSITY OF TECHNOLOGY AND EDUCATION</div>
+          <div>산학협력단 / R&D 비즈니스 협력센터 (경기도 시흥시 산기대학로 237)</div>
+        </div>
+      </div>
+      <div class="text-center md:text-right">
+        <div>SECURITY LEVEL: ENCRYPTED // TLO 2.0 MATRIX</div>
+        <div class="text-[11px] text-slate-600 mt-1">© TECH KOREA UNIV. ALL RESEARCH INTELLECTUAL PROPERTIES PROTECTED.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPT ENGINE -->
+  <script>
+    // 1. Research Project Database (Curated Visuals & Technical Deep Data)
+    const researchProjects = [
+      {
+        id: "PRJ-DIAMOND-01",
+        code: "NX-2026-SPC",
+        title: "다이아몬드 기반 극한 우주용 와이드갭 반도체 웨이퍼",
+        lead: "남옥현 교수 연구팀",
+        department: "신소재공학과 / 나노반도체 연구실",
+        category: "반도체/우주소재",
+        trl: "TRL 5 (우주환경 모사 실증)",
+        teaser: "열전도율 2,000 W/m·K 극한 돌파, 우주방사선 불침의 차세대 칩셋",
+        image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1000&q=80",
+        summary: "고온(500℃ 이상) 및 극한의 우주 방사선 환경에서도 성능 저하 없이 작동하는 단결정 다이아몬드 웨이퍼 제조 플랫폼과 질화물 반도체 이종성장 원천 기술을 개발했습니다. 기존 SiC나 GaN을 능가하는 꿈의 반도체 소재입니다.",
+        highlight: "APWS 아시아·태평양 와이드갭 반도체 국제학회 국내 대학 유일 기조강연 선정",
+        keyTech: "단결정 다이아몬드 기판 대구경화 합성, 열저항 극소화 이종 에피택시 인터페이스 접합",
+        application: "심우주 탐사선 고출력 송수신 모듈, 위성용 전력제어기, 차세대 초고전압 EV 인버터",
+        award: "산업통상자원부 산업기술 알키미스트 프로젝트 주관, APWS 2025 최우수 발표상"
+      },
+      {
+        id: "PRJ-LASER-02",
+        code: "NX-2026-LSR",
+        title: "AI 딥러닝 기반 실시간 레이저 스펙클(Speckle) 노이즈 감쇄 엔진",
+        lead: "김수민 교수 연구팀",
+        department: "전자공학부 광정보처리 연구실",
+        category: "AI/레이저광학",
+        trl: "TRL 8 (기업 상용화 라인 적용)",
+        teaser: "화질 왜곡 0%에 수렴하는 나노초 단위 광학 잡음 딥러닝 억제",
+        image: "https://images.unsplash.com/photo-1507413245164-6160d8298b31?auto=format&fit=crop&w=1000&q=80",
+        summary: "레이저 프로젝터 및 반도체 정밀 광학 검사 장비의 최대 난제인 간섭 불규칙 무늬(스펙클)를 초경량 온디바이스 AI 필터로 실시간 복원하는 알고리즘을 개발, 광학엔진의 선명도를 혁신했습니다.",
+        highlight: "(주)브라이튼코퍼레이션 중대형 기술이전 체결 및 성과연동형 계약 체결",
+        keyTech: "초고속 신경망 추론 하드웨어 가속기 IP, 동적 위상 변조 위상 제어 광학 동기화",
+        application: "차세대 AR/HUD 글래스, 초정밀 반도체 웨이퍼 결함 광학 스캐너, 수술용 3D 내시경",
+        award: "과기정통부 TLO혁신형 사업 우수 이전기술 선정, 특허청 산학협력 대상"
+      },
+      {
+        id: "PRJ-SYSTEM-03",
+        code: "NX-2026-SYS",
+        title: "산업 제어망 보호용 무중단 마이크로커널 OS 이중화 및 초고속 복구",
+        lead: "박성원 교수 연구팀",
+        department: "국제미래공학부 시스템보안 연구실",
+        category: "사이버보안/시스템",
+        trl: "TRL 7 (현장 통합 실증 완료)",
+        teaser: "랜섬웨어 침투 시 0.05초 만에 베어메탈 상태 원상 복구",
+        image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1000&q=80",
+        summary: "스마트팩토리 PLC 제어 PC 및 금융/국방 미션크리티컬 인프라가 사이버 공격이나 커널 패닉에 직면했을 때 실시간 페일오버와 무손실 블록 레벨 롤백을 구현하는 고신뢰 OS 이중화 플랫폼입니다.",
+        highlight: "보안·복구 전문기업 (주)티데이트 중대형 기술이전 및 산업단지 설비 공급",
+        keyTech: "마이크로커널 기반 샌드박스 격리 백업, 비휘발성 메모리(NVM) 초고속 스냅샷 저널링",
+        application: "국가 기반시설 SCADA 시스템, 스마트 그리드 제어 콘솔, 무인 전투체계 임베디드 OS",
+        award: "국제 시스템보안 특허 4건 등록, 과기부 기술사업화 촉진 지원 사업"
+      },
+      {
+        id: "PRJ-ROBOT-04",
+        code: "NX-2026-HMI",
+        title: "스마트 무인 오토메이션 멀티모달 HMI & 정밀 유체 캡슐 메커니즘",
+        lead: "이낙범 교수 연구팀",
+        department: "전자공학부 지능형 로보틱스 연구실",
+        category: "스마트로보틱스/HMI",
+        trl: "TRL 8 (프랜차이즈 상용 배치)",
+        teaser: "시선·제스처·음성 3중 융합 인터랙션과 무오염 무인 디스펜싱",
+        image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1000&q=80",
+        summary: "비접촉 제스처 인식과 다채널 노이즈 캔슬링 음성 인식을 통합한 비전 AI 키오스크와 마이크로 단위 정밀 디스펜싱 캡슐 장치를 융합한 차세대 리테일·서비스 로보틱스 솔루션입니다.",
+        highlight: "(주)원퍼스트글로벌 기술이전 및 국내 시범 매장 및 글로벌 수출 라인업 구축",
+        keyTech: "빔포밍 마이크로폰 어레이 기반 음성 분리, 무잔여 고압 유체 자동 밀폐 노즐 설계",
+        application: "완전 무인 스마트 카페, 바이오 무균 시약 자동 디스펜서, 스마트 키오스크 허브",
+        award: "대한민국 발명특허대전 장려상 수상, 대학 창의발명대회 특허청장상"
+      },
+      {
+        id: "PRJ-AXLAB-05",
+        code: "NX-2026-TWN",
+        title: "반월·시화 국가산단 제조 AX 가상 공정 디지털트윈 및 AI 예지보전",
+        lead: "공정혁신시뮬레이션센터",
+        department: "산학융합본부 / AI 제조데이터 센터",
+        category: "디지털트윈/제조AX",
+        trl: "TRL 9 (실제 사업 현장 적용)",
+        teaser: "공정 시뮬레이션으로 중소 제조사 불량률 62% 감소, 고장 사전 예측",
+        image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1000&q=80",
+        summary: "고가의 물리 시험 장비 없이도 초정밀 가공 공정의 열 변형 및 응력을 슈퍼컴퓨팅으로 시뮬레이션하고, 설비의 고장을 사전 징후 단계에서 탐지하는 산업 단지 맞춤형 제조 AX 플랫폼입니다.",
+        highlight: "산단 500여 중소기업 가상 실증 지원, 제품 개발 기간 40% 단축 검증",
+        keyTech: "GPU 가속 유한요소해석(FEA) 알고리즘, 진동·전류 스펙트로그램 딥러닝 결함 진단",
+        application: "뿌리산업(금형, 열처리, 단조), 초정밀 자동차 전장 모듈 조립 라인, 배터리 팩 공정",
+        award: "산업통상자원부 스마트그린산단 제조혁신 최우수 센터 장관 표창"
+      },
+      {
+        id: "PRJ-HBM-06",
+        code: "NX-2026-PKG",
+        title: "초고발열 AI 가속기용 초박막 인터포저 및 복합 열계면(TIM) 소재",
+        lead: "첨단반도체패키지 ICC",
+        department: "RISE 5T 반도체 컨소시엄",
+        category: "첨단패키징/HBM",
+        trl: "TRL 6 (모듈 단위 열신뢰성 검증)",
+        teaser: "HBM 4세대 극한 발열을 제어하는 나노 탄소 복합 방열막 기술",
+        image: "https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=1000&q=80",
+        summary: "고대역폭메모리(HBM)와 초거대 AI 가속기 칩셋 패키징 시 발생하는 국소 핫스팟의 열을 기존 구리 대비 3배 속도로 확산시키는 차세대 3D 인터포저 소재 및 저온 고밀도 본딩 공정입니다.",
+        highlight: "경기도 RISE 5T 특화 기업협업센터(ICC) 주관 소부장 중견기업 32개사 참여",
+        keyTech: "정렬형 카본나노튜브(CNT) 복합 열전도 시트, 미세 피치 다이렉트 카퍼 본딩 기법",
+        application: "데이터센터 AI 학습용 GPU/NPU 패키지, 자율주행 차량용 슈퍼컴퓨팅 보드",
+        award: "국내외 첨단 반도체 패키징 원천 특허 7건 등록, 반도체 소부장 연계 과제"
+      }
+    ];
+
+    // 2. 5T ICC Centers
+    const iccData = [
+      {
+        title: "미래 첨단 반도체 패키지 ICC",
+        code: "ICC-SEMI-01",
+        color: "cyber-neonCyan",
+        desc: "2.5D/3D 첨단 패키징, 이종 접합 소재, 초미세 피치 인터포저 및 AI 반도체 신뢰성 평가 산학 허브.",
+        partners: "32개사 반도체 소부장 컨소시엄",
+        image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"
+      },
+      {
+        title: "탄소중립 & 그린에너지 ICC",
+        code: "ICC-GREEN-02",
+        color: "cyber-neonGreen",
+        desc: "산단 폐열 회수, 고체산화물 연료전지(SOFC), 차세대 이차전지 리사이클링 및 탄소배출 실시간 계측.",
+        partners: "24개사 친환경 에너지 네트워크",
+        image: "https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&w=600&q=80"
+      },
+      {
+        title: "제조 DX / AX 혁신 ICC",
+        code: "ICC-AUTO-03",
+        color: "cyber-neonPink",
+        desc: "자율제조 로봇(AMR/AGV), 공정 가상 시뮬레이션, 비전 딥러닝 불량 검사 및 스마트팩토리 실증.",
+        partners: "60개사 수요·공급 기업군",
+        image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80"
+      },
+      {
+        title: "첨단 모빌리티 & 전장 ICC",
+        code: "ICC-MOBIL-04",
+        color: "cyber-neonAmber",
+        desc: "구동모터 코어 소재, 라이다 광학 센서 패키징, 자율주행 V2X 통신 모듈 및 파워트레인 전장화.",
+        partners: "40개사 미래차 부품 벨트",
+        image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=600&q=80"
+      },
+      {
+        title: "첨단 바이오 & 스마트 헬스 ICC",
+        code: "ICC-BIO-05",
+        color: "cyber-neonPurple",
+        desc: "스마트 생체 신호 모니터링 센서, 웨어러블 헬스케어 메카트로닉스 및 디지털 체외진단 디바이스.",
+        partners: "18개사 바이오메디컬 기업",
+        image: "https://images.unsplash.com/photo-1530497610245-94d3c16cda28?auto=format&fit=crop&w=600&q=80"
+      },
+      {
+        title: "제조 AX 실증 오픈랩 (Open Lab)",
+        code: "LAB-OPEN-06",
+        color: "cyber-neonCyan",
+        desc: "고성능 GPU 클러스터, 3D 초정밀 광학 계측기, 로봇 자동화 테스트베드를 입주기업에게 상시 개방.",
+        partners: "연간 150건 이상 기업 밀착 지원",
+        image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80"
+      }
+    ];
+
+    // Render Research Cards
+    function renderResearchCards(data) {
+      const grid = document.getElementById('researchGrid');
+      const counter = document.getElementById('cardCount');
+      if (counter) counter.innerText = data.length;
+      grid.innerHTML = '';
+
+      if (data.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-20 text-center font-mono text-slate-500">
+            <i data-lucide="alert-triangle" class="w-12 h-12 mx-auto mb-3 text-cyber-neonPink opacity-70"></i>
+            <p>// QUERY RETURNED 0 MATCHES IN ARCHIVE</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      data.forEach(item => {
+        const card = document.createElement('div');
+        card.className = "cyber-card rounded-xl group flex flex-col justify-between";
+        card.innerHTML = `
+          <div>
+            <!-- Visual Media Container -->
+            <div class="relative h-48 overflow-hidden">
+              <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 filter brightness-90 group-hover:brightness-105">
+              <div class="absolute inset-0 bg-gradient-to-t from-cyber-card via-transparent to-black/30"></div>
+              
+              <!-- Badges on Image -->
+              <div class="absolute top-3 left-3 flex items-center gap-1.5 font-mono text-[10px]">
+                <span class="px-2 py-0.5 rounded bg-black/70 border border-cyber-neonCyan/50 text-cyber-neonCyan font-bold backdrop-blur-md">
+                  ${item.code}
+                </span>
+                <span class="px-2 py-0.5 rounded bg-black/70 border border-cyber-neonPink/50 text-cyber-neonPink font-bold backdrop-blur-md">
+                  ${item.trl}
+                </span>
+              </div>
+
+              <!-- Intriguing Hook Banner -->
+              <div class="absolute bottom-2 left-3 right-3 text-xs font-mono text-cyber-neonAmber flex items-center gap-1 drop-shadow">
+                <i data-lucide="zap" class="w-3.5 h-3.5 text-cyber-neonAmber animate-pulse"></i>
+                <span class="truncate font-semibold">${item.teaser}</span>
+              </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="p-5 space-y-3">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-400">
+                <span class="text-white font-semibold flex items-center gap-1">
+                  <i data-lucide="user" class="w-3 h-3 text-cyber-neonCyan"></i> ${item.lead}
+                </span>
+                <span>${item.department.split('/')[0]}</span>
+              </div>
+
+              <h3 class="text-base font-bold text-white group-hover:text-cyber-neonCyan transition leading-snug line-clamp-2">
+                ${item.title}
+              </h3>
+
+              <div class="p-2.5 rounded bg-cyber-darker border-l-2 border-cyber-neonCyan font-mono text-[11px] text-slate-300">
+                <span class="text-cyber-neonCyan font-bold">[BREAKTHROUGH]</span> ${item.highlight}
+              </div>
+
+              <p class="text-xs text-slate-400 font-light line-clamp-2 leading-relaxed">
+                ${item.summary}
+              </p>
+            </div>
+          </div>
+
+          <!-- Card Bottom Action -->
+          <div class="p-4 pt-0">
+            <button onclick="openDetailModal('${item.id}')" class="w-full py-2 px-3 rounded bg-cyber-darker hover:bg-cyber-neonCyan hover:text-black border border-cyber-border hover:border-cyber-neonCyan font-mono text-xs font-bold text-cyber-neonCyan transition flex items-center justify-center gap-2 group-hover:shadow-[0_0_15px_rgba(0,240,255,0.4)]">
+              <span>EXPLORE PROTOCOL</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    // Render Transfer Spotlights
+    function renderTransferSection() {
+      const highlightGrid = document.getElementById('transferHighlightGrid');
+      const listContainer = document.getElementById('transferCaseList');
+
+      const transferCases = researchProjects.filter(p => p.trl.includes('상용화') || p.trl.includes('적용') || p.highlight.includes('기술이전'));
+
+      // Render 3 Visual Spotlight Cards
+      highlightGrid.innerHTML = transferCases.slice(0, 3).map(p => `
+        <div class="cyber-card rounded-xl overflow-hidden group">
+          <div class="relative h-44">
+            <img src="${p.image}" class="w-full h-full object-cover filter brightness-85 group-hover:scale-105 transition duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-cyber-card to-transparent"></div>
+            <div class="absolute top-3 left-3 px-2 py-0.5 rounded bg-black/70 border border-cyber-neonGreen text-cyber-neonGreen font-mono text-[10px] font-bold">
+              LICENSING COMPLETED
+            </div>
+          </div>
+          <div class="p-5 space-y-3">
+            <div class="font-mono text-xs text-cyber-neonPink font-bold">${p.lead}</div>
+            <h4 class="text-sm font-bold text-white group-hover:text-cyber-neonCyan transition line-clamp-2">${p.title}</h4>
+            <p class="text-xs text-slate-400 line-clamp-2">${p.summary}</p>
+            <div class="pt-2 border-t border-cyber-border flex items-center justify-between font-mono text-xs">
+              <span class="text-slate-400">STATUS: ACTIVE</span>
+              <button onclick="openInquiryModal('[기술이전 상담] ${p.title}')" class="text-cyber-neonCyan hover:underline font-bold flex items-center gap-1">
+                도입문의 <i data-lucide="arrow-right" class="w-3 h-3"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      // Render List
+      listContainer.innerHTML = researchProjects.map(p => `
+        <div class="py-3 px-2 flex flex-col md:flex-row md:items-center justify-between gap-2 hover:bg-cyber-darker/60 transition">
+          <div class="flex items-center gap-3">
+            <span class="px-2 py-0.5 rounded bg-cyber-darker border border-cyber-border text-slate-400 text-[10px]">${p.code}</span>
+            <span class="font-bold text-white text-xs">${p.title}</span>
+          </div>
+          <div class="flex items-center gap-4 text-slate-400">
+            <span class="text-cyber-neonCyan">${p.lead}</span>
+            <button onclick="openDetailModal('${p.id}')" class="text-white hover:text-cyber-neonPink transition">
+              <i data-lucide="external-link" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    // Render ICC Cards
+    function renderICCCards() {
+      const grid = document.getElementById('iccCardsGrid');
+      grid.innerHTML = iccData.map(icc => `
+        <div class="cyber-card rounded-xl overflow-hidden group">
+          <div class="relative h-40">
+            <img src="${icc.image}" class="w-full h-full object-cover filter brightness-75 group-hover:scale-105 transition duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-cyber-card via-transparent to-transparent"></div>
+            <div class="absolute top-3 left-3 px-2 py-0.5 rounded bg-black/70 border border-${icc.color} text-${icc.color} font-mono text-[10px] font-bold">
+              ${icc.code}
+            </div>
+          </div>
+          <div class="p-5 space-y-2">
+            <h3 class="font-bold text-white text-base group-hover:text-cyber-neonCyan transition">${icc.title}</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">${icc.desc}</p>
+            <div class="pt-3 border-t border-cyber-border flex items-center justify-between font-mono text-[11px]">
+              <span class="text-slate-400 font-semibold">${icc.partners}</span>
+              <button onclick="openInquiryModal('[센터참여] ${icc.title}')" class="text-cyber-neonAmber hover:underline font-bold flex items-center gap-1">
+                협력참여 <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    // Filter Logic
+    function applyFilter() {
+      const term = document.getElementById('searchInput').value.toLowerCase().trim();
+      const field = document.getElementById('fieldFilter').value;
+
+      const filtered = researchProjects.filter(p => {
+        const matchesTerm = p.title.toLowerCase().includes(term) ||
+                            p.lead.toLowerCase().includes(term) ||
+                            p.category.toLowerCase().includes(term) ||
+                            p.summary.toLowerCase().includes(term) ||
+                            p.keyTech.toLowerCase().includes(term) ||
+                            p.code.toLowerCase().includes(term);
+        const matchesField = field === "ALL" || p.category === field;
+        return matchesTerm && matchesField;
+      });
+
+      renderResearchCards(filtered);
+    }
+
+    // Modal Handlers
+    function openDetailModal(id) {
+      const item = researchProjects.find(p => p.id === id);
+      if (!item) return;
+
+      document.getElementById('modalImage').src = item.image;
+      document.getElementById('modalCode').innerText = `[${item.code}]`;
+      document.getElementById('modalCategory').innerText = item.category;
+      document.getElementById('modalTitle').innerText = item.title;
+      document.getElementById('modalLead').innerText = item.lead;
+      document.getElementById('modalDept').innerText = item.department;
+      document.getElementById('modalTRL').innerText = item.trl;
+      document.getElementById('modalSummary').innerText = item.summary;
+      document.getElementById('modalKeyTech').innerText = item.keyTech;
+      document.getElementById('modalApplication').innerText = item.application;
+      document.getElementById('modalAward').innerText = item.award;
+
+      document.getElementById('modalActionBtn').onclick = () => {
+        closeDetailModal();
+        openInquiryModal(`[기술이전/연구협력] ${item.title} (${item.lead})`);
+      };
+
+      document.getElementById('detailModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detailModal').classList.add('hidden');
+    }
+
+    function openInquiryModal(subject = '') {
+      if (subject) {
+        document.getElementById('inquirySubject').value = subject;
+      }
+      document.getElementById('inquiryModal').classList.remove('hidden');
+    }
+
+    function closeInquiryModal() {
+      document.getElementById('inquiryModal').classList.add('hidden');
+    }
+
+    function handleInquirySubmit(e) {
+      e.preventDefault();
+      alert('SYSTEM ACKNOWLEDGED // 산학협력단 기술이전본부로 전송되었습니다. 24시간 이내 전담 변리사 및 연구진이 암호화 회신을 드립니다.');
+      closeInquiryModal();
+      document.getElementById('inquiryForm').reset();
+    }
+
+    // Tab Navigation
+    function navigateTab(tabName) {
+      const sections = ['explore', 'transfer', 'centers', 'stats'];
+      sections.forEach(s => {
+        const el = document.getElementById(s + 'Section');
+        if (el) el.classList.toggle('hidden', s !== tabName);
+      });
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        const isCurrent = btn.dataset.tab === tabName;
+        if (isCurrent) {
+          btn.className = "nav-btn px-4 py-2.5 rounded border transition-all flex items-center gap-2 text-cyber-neonCyan border-cyber-neonCyan bg-cyber-neonCyan/10 shadow-[0_0_12px_rgba(0,240,255,0.25)]";
+        } else {
+          btn.className = "nav-btn px-4 py-2.5 rounded border border-transparent hover:border-slate-700 text-slate-300 hover:text-white transition-all flex items-center gap-2";
+        }
+      });
+
+      if (tabName === 'stats') {
+        initCharts();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Chart.js Cyber Neon Theme
+    let chartsInit = false;
+    function initCharts() {
+      if (chartsInit) return;
+      chartsInit = true;
+
+      // Chart 1
+      const ctx1 = document.getElementById('transferTrendChart').getContext('2d');
+      new Chart(ctx1, {
+        type: 'bar',
+        data: {
+          labels: ['2021', '2022', '2023', '2024', '2025(EST)'],
+          datasets: [
+            {
+              label: '기술료 수입 (억원)',
+              data: [15.2, 22.8, 31.5, 48.2, 62.0],
+              backgroundColor: 'rgba(0, 240, 255, 0.7)',
+              borderColor: '#00F0FF',
+              borderWidth: 1,
+              borderRadius: 4,
+              yAxisID: 'y'
+            },
+            {
+              label: '이전 계약 건수',
+              data: [42, 58, 73, 95, 120],
+              type: 'line',
+              borderColor: '#FF007F',
+              backgroundColor: '#FF007F',
+              tension: 0.3,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#94A3B8', font: { family: 'JetBrains Mono' } } }
+          },
+          scales: {
+            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8', font: { family: 'JetBrains Mono' } } },
+            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#00F0FF', font: { family: 'JetBrains Mono' } } },
+            y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#FF007F', font: { family: 'JetBrains Mono' } } }
+          }
+        }
+      });
+
+      // Chart 2
+      const ctx2 = document.getElementById('domainDistributionChart').getContext('2d');
+      new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+          labels: ['첨단반도체/패키징', '제조 AX/디지털트윈', '모빌리티/전장', '탄소중립/그린', '스마트바이오'],
+          datasets: [{
+            data: [35, 25, 18, 14, 8],
+            backgroundColor: [
+              '#00F0FF',
+              '#FF007F',
+              '#FFB800',
+              '#00FF66',
+              '#9D00FF'
+            ],
+            borderWidth: 2,
+            borderColor: '#05070D'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'right', labels: { color: '#CBD5E1', font: { family: 'JetBrains Mono', size: 11 } } }
+          }
+        }
+      });
+    }
+
+    // Realtime Clock simulation
+    function updateClock() {
+      const now = new Date();
+      const el = document.getElementById('systemClock');
+      if (el) {
+        el.innerText = now.toISOString().replace('T', ' ').substring(0, 19) + " KST";
+      }
+    }
+    setInterval(updateClock, 1000);
+
+    // Event Listeners
+    document.getElementById('searchInput').addEventListener('input', applyFilter);
+    document.getElementById('fieldFilter').addEventListener('change', applyFilter);
+
+    // Init
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      renderResearchCards(researchProjects);
+      renderTransferSection();
+      renderICCCards();
+    });
+  </script>
+</body>
+</html>
